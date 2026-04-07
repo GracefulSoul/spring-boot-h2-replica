@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: spring-boot-h2-replica
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+        format_sql: true
+
+  datasource:
+    primary:
+      driver-class-name: org.h2.Driver
+      jdbc-url: jdbc:h2:mem:primary;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false
+      username: sa
+      password:
+      hikari:
+        maximum-pool-size: 10
+        minimum-idle: 2
+        connection-timeout: 20000
+        idle-timeout: 300000
+        max-lifetime: 1200000
+
+    replica:
+      driver-class-name: org.h2.Driver
+      jdbc-url: jdbc:h2:mem:replica;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false
+      username: sa
+      password:
+      hikari:
+        maximum-pool-size: 10
+        minimum-idle: 2
+        connection-timeout: 20000
+        idle-timeout: 300000
+        max-lifetime: 1200000
+
+logging:
+  level:
+    root: INFO
+    com.gracefulsoul: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36} - [%X{DATASOURCE}] %msg%n"
+    file: "[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36} - [%X{DATASOURCE}] %msg%n"

@@ -1,0 +1,67 @@
+# 운영 환경 설정 (MySQL Replica 예제)
+spring:
+  application:
+    name: spring-boot-h2-replica
+    version: 1.0.0
+
+  jpa:
+    hibernate:
+      ddl-auto: validate  # 운영에서는 validate만 사용
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          batch_size: 50
+          fetch_size: 100
+        order_inserts: true
+        order_updates: true
+        format_sql: false
+        use_sql_comments: true
+
+  datasource:
+    primary:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://primary-db-server:3306/app_db?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=true&verifyServerCertificate=false
+      username: ${DB_PRIMARY_USER}
+      password: ${DB_PRIMARY_PASSWORD}
+      hikari:
+        auto-commit: true
+        maximum-pool-size: 20
+        minimum-idle: 5
+        connection-timeout: 20000
+        idle-timeout: 300000
+        max-lifetime: 1200000
+        connection-test-query: "SELECT 1"
+
+    replica:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://replica-db-server:3306/app_db?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=true&verifyServerCertificate=false
+      username: ${DB_REPLICA_USER}
+      password: ${DB_REPLICA_PASSWORD}
+      hikari:
+        auto-commit: true
+        maximum-pool-size: 20
+        minimum-idle: 5
+        connection-timeout: 20000
+        idle-timeout: 300000
+        max-lifetime: 1200000
+        connection-test-query: "SELECT 1"
+
+logging:
+  level:
+    root: WARN
+    com.gracefulsoul: INFO
+    org.springframework.web: INFO
+  pattern:
+    console: "[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36} %msg%n"
+    file: "[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36} %msg%n"
+  file:
+    name: logs/application.log
+    max-size: 10MB
+    max-history: 30
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
