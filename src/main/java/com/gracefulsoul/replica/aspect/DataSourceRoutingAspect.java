@@ -29,8 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class DataSourceRoutingAspect {
 
-    private static final String POINTCUT_READ_ONLY_ON_REPLICA = "@annotation(com.gracefulsoul.replica.routing.ReadOnlyOnReplica)";
-
     /**
      * @ReadOnlyOnReplica 어노테이션이 붙은 메서드를 처리합니다.
      * 메서드 실행 전에 Replica로 전환하고, 완료 후 원래 상태로 복원합니다.
@@ -40,7 +38,7 @@ public class DataSourceRoutingAspect {
      * @return 메서드 실행 결과
      * @throws Throwable 메서드 실행 중 발생한 예외
      */
-    @Around(POINTCUT_READ_ONLY_ON_REPLICA)
+    @Around("@annotation(com.gracefulsoul.replica.routing.ReadOnlyOnReplica)")
     public Object aroundReadOnlyOnReplica(ProceedingJoinPoint joinPoint, ReadOnlyOnReplica readOnlyOnReplica) throws Throwable {
         String methodName = joinPoint.getSignature().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
