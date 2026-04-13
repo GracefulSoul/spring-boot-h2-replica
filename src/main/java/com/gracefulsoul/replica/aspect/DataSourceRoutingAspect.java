@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,13 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
  * 3. 메서드 실행 중: 설정된 DataSource가 사용됩니다
  * 4. 메서드 완료 후 원래 상태로 복원합니다
  */
+@Slf4j
 @Aspect
 @Component
-@Slf4j
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DataSourceRoutingAspect {
 
     private static final String POINTCUT_READ_ONLY_ON_REPLICA = "@annotation(com.gracefulsoul.replica.routing.ReadOnlyOnReplica)";
-    private static final String POINTCUT_TRANSACTIONAL_READ_ONLY = "@annotation(org.springframework.transaction.annotation.Transactional) && args()";
 
     /**
      * @ReadOnlyOnReplica 어노테이션이 붙은 메서드를 처리합니다.
@@ -64,7 +66,7 @@ public class DataSourceRoutingAspect {
      * @return 메서드 실행 결과
      * @throws Throwable 메서드 실행 중 발생한 예외
      */
-    @Around("@annotation(transactional)")
+    @Around("@annotation(org.springframework.transaction.annotation.Transactional)")
     public Object aroundTransactionalMethod(ProceedingJoinPoint joinPoint, Transactional transactional) throws Throwable {
         // readOnly=false인 경우는 Primary를 기본값으로 사용하므로 처리하지 않음
         if (!transactional.readOnly()) {
